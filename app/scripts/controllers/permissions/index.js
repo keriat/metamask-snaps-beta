@@ -506,6 +506,20 @@ export class PermissionsController {
   }
 
   /**
+   * Removes all permissions for the given domains.
+   *
+   * @param {string[]} domainsToDelete - The domains to remove all permissions for.
+   */
+  removeAllPermissionsFor(domainsToDelete) {
+    const domains = this.permissions.getDomains();
+    domainsToDelete.forEach((domain) => {
+      delete domains[domain];
+      this.notifyAccountsChanged(domain, []);
+    });
+    this.permissions.setDomains(domains);
+  }
+
+  /**
    * Removes all known domains and their related permissions.
    */
   clearPermissions() {
