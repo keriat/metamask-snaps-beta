@@ -31,7 +31,10 @@ import { MAINNET_CHAIN_ID } from '../../shared/constants/network';
 import ComposableObservableStore from './lib/ComposableObservableStore';
 import AccountTracker from './lib/account-tracker';
 import createLoggerMiddleware from './lib/createLoggerMiddleware';
-import createMethodMiddleware from './lib/rpc-method-middleware';
+import {
+  createMethodMiddleware,
+  createPluginMethodMiddleware,
+} from './lib/rpc-method-middleware';
 import createOriginMiddleware from './lib/createOriginMiddleware';
 import createTabIdMiddleware from './lib/createTabIdMiddleware';
 import createOnboardingMiddleware from './lib/createOnboardingMiddleware';
@@ -250,7 +253,6 @@ export default class MetamaskController extends EventEmitter {
         getKeyringAccounts: this.keyringController.getAccounts.bind(
           this.keyringController,
         ),
-        getRestrictedMethods,
         getUnlockPromise: this.appStateController.getUnlockPromise.bind(
           this.appStateController,
         ),
@@ -259,7 +261,6 @@ export default class MetamaskController extends EventEmitter {
         notifyAllDomains: this.notifyAllConnections.bind(this),
         preferences: this.preferencesController.store,
       },
-      initState.PermissionsController,
       initState.PermissionsMetadata,
     );
 
@@ -278,6 +279,19 @@ export default class MetamaskController extends EventEmitter {
       workerUrl: WORKER_BLOB_URL,
       initState: initState.PluginController,
     });
+
+    this.permissionsController.initializePermissions(
+      initState.PermissionsController,
+      getRestrictedMethods,
+      {
+        addPlugin: this.pluginController.add.bind(this.pluginController),
+        getPlugin: this.pluginController.get.bind(this.pluginController),
+        getPluginRpcHandler: this.pluginController.getRpcMessageHandler.bind(
+          this.pluginController,
+        ),
+        showConfirmation: window.confirm, // Eventually, a template confirmation.
+      },
+    );
 
     this.detectTokensController = new DetectTokensController({
       preferences: this.preferencesController,
@@ -1520,6 +1534,18 @@ export default class MetamaskController extends EventEmitter {
     return promise;
   }
 
+  async getAppKeyForDomain(domain, requestedAccount) {
+    let account;
+
+    if (requestedAccount) {
+      account = requestedAccount;
+    } else {
+      account = (await this.permissionsController.getAccounts(domain))[0];
+    }
+
+    return this.keyringController.exportAppKeyForAddress(account, domain);
+  }
+
   /**
    * Signifies user intent to complete an eth_sign method.
    *
@@ -2129,7 +2155,12 @@ export default class MetamaskController extends EventEmitter {
   }) {
     // setup json rpc engine stack
     const engine = new JsonRpcEngine();
-    const { provider, blockTracker } = this;
+    const {
+      blockTracker,
+      permissionsController,
+      pluginController,
+      provider,
+    } = this;
 
     // create filter polyfill middleware
     const filterMiddleware = createFilterMiddleware({ provider, blockTracker });
@@ -2213,6 +2244,40 @@ export default class MetamaskController extends EventEmitter {
         },
       }),
     );
+
+    if (isPlugin) {
+      engine.push(
+        createPluginMethodMiddleware({
+          origin,
+          getAppKey: this.getAppKeyForDomain.bind(this, origin),
+          getSnapState: pluginController.getPluginState.bind(
+            pluginController,
+            origin,
+          ),
+          updateSnapState: pluginController.updateSnapState.bind(
+            pluginController,
+            origin,
+          ),
+          clearSnapState: pluginController.updatePluginState.bind(
+            pluginController,
+            origin,
+            {},
+          ),
+          requestPermissions: permissionsController._requestPermissions.bind(
+            permissionsController,
+            origin,
+          ),
+          getAccounts: permissionsController._getPermittedAccounts.bind(
+            permissionsController,
+            origin,
+          ),
+          installPlugins: pluginController.installPlugins.bind(
+            pluginController,
+            origin,
+          ),
+        }),
+      );
+    }
 
     // filter and subscription polyfills
     engine.push(filterMiddleware);
