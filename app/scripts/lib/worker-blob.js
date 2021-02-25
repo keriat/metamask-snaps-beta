@@ -5,12 +5,15 @@ const fs = require('fs');
 // Our brfs transform is extremely cranky, and will not apply itself unless
 // fs.readFileSync is called here, at the top-level, outside any function, with
 // a string literal path, and no encoding parameter.
-export const WORKER_BLOB_URL = getWorkerUrl(
-  fs.readFileSync(
-    require.resolve('@mm-snap/workers/dist/pluginWorker.js'),
-    'utf8',
-  ),
-);
+export const WORKER_BLOB_URL =
+  process.env.METAMASK_ENV === 'test'
+    ? 'https://fake.url'
+    : getWorkerUrl(
+        fs.readFileSync(
+          require.resolve('@mm-snap/workers/dist/pluginWorker.js'),
+          'utf8',
+        ),
+      );
 /* eslint-enable node/no-sync */
 
 function getWorkerUrl(workerSrc) {

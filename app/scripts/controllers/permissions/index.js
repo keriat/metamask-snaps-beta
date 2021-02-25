@@ -177,6 +177,18 @@ export class PermissionsController {
   }
 
   /**
+   * Initiates a permissions request with the given permissions for for the
+   * given origin.
+   *
+   * @param {string} origin - The origin.
+   * @param {IRequestedPermissions} - The requested permissions.
+   * @returns {Promise<IOcapLdCapability[]>} The approved permissions, if any.
+   */
+  requestPermissions(origin, permissions) {
+    return this._requestPermissions({ origin }, permissions);
+  }
+
+  /**
    * Submits a permissions request to rpc-cap. Internal, background use only.
    *
    * @param {IOriginMetadata} domain - The external domain metadata.
@@ -516,6 +528,7 @@ export class PermissionsController {
    */
   clearPermissions() {
     this.permissions.clearDomains();
+    this.permissionsLog.clear();
     // It's safe to notify that no accounts are available, regardless of
     // extension lock state
     this._notifyAllDomains({
@@ -703,6 +716,7 @@ export class PermissionsController {
 
     // these permission requests are almost certainly stale
     const initState = { ...restoredPermissions, permissionsRequests: [] };
+    delete initState.permissionsDescriptions;
 
     this.permissions = new RpcCap(
       {

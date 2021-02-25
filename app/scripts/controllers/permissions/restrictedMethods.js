@@ -1,4 +1,4 @@
-import { restricted } from '@mm-snap/rpc-methods';
+import { restrictedMethods as restrictedPluginMethods } from '@mm-snap/rpc-methods';
 
 /**
  * @typedef RestrictedMethodHooks
@@ -47,7 +47,7 @@ export default function getRestrictedMethods({
  * @param {PluginRestrictedMethodHooks} hooks - Plugin restricted method hooks.
  */
 export function getPluginRestrictedMethods(hooks) {
-  return restricted.reduce((restrictedMethods, handler) => {
+  return restrictedPluginMethods.reduce((restrictedMethods, handler) => {
     restrictedMethods[handler.methodNames[0]] = {
       description: handler.permissionDescription,
       method: handler.implementationGetter(hooks),
@@ -62,6 +62,7 @@ export function getCommonRestrictedMethods({
 }) {
   return {
     eth_accounts: {
+      description: 'View Ethereum accounts',
       method: async (_req, res, _next, end) => {
         try {
           const accounts = await getKeyringAccounts();

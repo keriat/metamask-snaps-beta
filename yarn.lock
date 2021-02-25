@@ -2348,39 +2348,39 @@
   resolved "https://registry.yarnpkg.com/@metamask/test-dapp/-/test-dapp-4.0.1.tgz#fbc66069687f0502ebb4c6ac0fa7c9862ea6563c"
   integrity sha512-FN2Rz7ctY7Blx3iK6AmZmZEU+TkvEcpYvvebUmqZyOrmjh/DsYKVxfRicVAbyK9mDkeJ18Gx8r7swwFFR4rSgA==
 
-"@mm-snap/controllers@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@mm-snap/controllers/-/controllers-0.0.1.tgz#bbd28d1018caa356ade462669a84d8c11e96517c"
-  integrity sha512-PbdKHtwhGQ/Afy9FtLTQ+EjjCn5SuDtLRmeLHvgsJlbC702AhPkxRyWyh1fVvQiDOKCfNI7Fgq55ZvYw3wN8MQ==
+"@mm-snap/controllers@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@mm-snap/controllers/-/controllers-0.0.2.tgz#b4a12f5152caf8bdad92cda09824c89ebcc375bf"
+  integrity sha512-vEMG2aZdrLDb44ny3QjSK2+KrqY7GJ7A/vDrFbrH28tyGUWEB5yQZkM4MJsJtNmlLPeK5glSJe+P/3lQRw7T/A==
   dependencies:
     "@metamask/object-multiplex" "^1.1.0"
     "@metamask/obs-store" "^6.0.2"
     "@metamask/safe-event-emitter" "^2.0.0"
-    "@mm-snap/post-message-stream" "^0.0.1"
-    "@mm-snap/workers" "^0.0.1"
+    "@mm-snap/post-message-stream" "^0.0.2"
+    "@mm-snap/workers" "^0.0.2"
     eth-rpc-errors "^4.0.2"
     nanoid "^3.1.20"
     pump "^3.0.0"
 
-"@mm-snap/post-message-stream@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@mm-snap/post-message-stream/-/post-message-stream-0.0.1.tgz#4dcc029836244ae3dd362a800b6e89a950fe0265"
-  integrity sha512-DC6OKEcuVf6IE69eL9OhGO8yGFTYXJQ6kC6v5+SmPpFyHqIfF77L/GoEaCc09d9xZIhZlqULvAoja8lHqnL8jA==
+"@mm-snap/post-message-stream@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@mm-snap/post-message-stream/-/post-message-stream-0.0.2.tgz#2946c056a44b7689ee195ba00067279dbefb4691"
+  integrity sha512-gesrv+dCULt7xf6CevHt0TT2Hk4JaYS/ZD3VnTfpsJRB7GZaV9TLF/LRV9jLQk4XAsq309b65KETDMItr5mMLA==
   dependencies:
     readable-stream "2.3.3"
 
-"@mm-snap/rpc-methods@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@mm-snap/rpc-methods/-/rpc-methods-0.0.1.tgz#31fa447967985393c802699e0eeef70d3e6f40ed"
-  integrity sha512-5Q7aS+jH2ZltxDnGw9xUS4YsKrRxmCcGvljEGheVspfz8J6zk5KbRHtY0zxGd1m47xO+2Xyb9NNabL5HzDY2mw==
+"@mm-snap/rpc-methods@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@mm-snap/rpc-methods/-/rpc-methods-0.0.2.tgz#b23d573235bc343e7f857f01a965ea7304b7e931"
+  integrity sha512-yzJ0LsWeah3JSDQQOvTp6Bd+03B+SOuct/B+vRqZd9aCUeX2Gf4Fc6AN3CIDZhZ2s+HN2cgU7xyvhTgf6W2oXQ==
   dependencies:
-    "@mm-snap/controllers" "^0.0.1"
+    "@mm-snap/controllers" "^0.0.2"
     eth-rpc-errors "^4.0.2"
 
-"@mm-snap/workers@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@mm-snap/workers/-/workers-0.0.1.tgz#bdbf943c2504c2a1f84831b995697210536d609d"
-  integrity sha512-nwPfX5Rj1Du32ndavTULj19IXBgoIvdHsM6B/z6NPkPvKqbIq9tvayUATIU+/Ijrft81KnEb4uwuqRoV+DW/cQ==
+"@mm-snap/workers@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@mm-snap/workers/-/workers-0.0.2.tgz#f98ced35717beebd5b48fe70710ee7c2f9aac5d6"
+  integrity sha512-DZJOiyr+PnEKq1kMioljQVY1r5BmTa3kRCmUxQYNwaIzmhmLuBuU1du1jHCMHxXD9DfIWy7DRZCoJoe6XIDDeA==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -21209,19 +21209,6 @@ readable-stream@2.3.3:
     process-nextick-args "~1.0.6"
     safe-buffer "~5.1.1"
     string_decoder "~1.0.3"
-    util-deprecate "~1.0.1"
-
-readable-stream@^2.2.2:
-  version "2.3.7"
-  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.7.tgz#1eca1cf711aef814c04f62252a36a62f6cb23b57"
-  integrity sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==
-  dependencies:
-    core-util-is "~1.0.0"
-    inherits "~2.0.3"
-    isarray "~1.0.0"
-    process-nextick-args "~2.0.0"
-    safe-buffer "~5.1.1"
-    string_decoder "~1.1.1"
     util-deprecate "~1.0.1"
 
 readable-stream@~1.0.15:

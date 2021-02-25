@@ -18,6 +18,8 @@ import {
   getThreeBoxLastUpdated,
   runInlinePlugin,
   removeInlinePlugin,
+  clearPlugins,
+  clearPermissions,
   setShowRestorePromptToFalse,
   setConnectedStatusPopoverHasBeenShown,
   setDefaultHomeActiveTabName,
@@ -135,6 +137,8 @@ const mapDispatchToProps = (dispatch) => ({
     setAlertEnabledness(ALERT_TYPES.web3ShimUsage, false),
   runInlinePlugin: () => dispatch(runInlinePlugin()),
   removeInlinePlugin: () => dispatch(removeInlinePlugin()),
+  clearPlugins: () => dispatch(clearPlugins()),
+  clearPermissions: () => dispatch(clearPermissions()),
 });
 
 export default compose(

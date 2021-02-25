@@ -267,7 +267,10 @@ export default class MetamaskController extends EventEmitter {
     this.pluginController = new PluginController({
       setupWorkerPluginProvider: this.setupWorkerPluginProvider.bind(this),
       closeAllConnections: this.removeAllConnections.bind(this),
-      requestPermissions: this.permissionsController._requestPermissions.bind(
+      hasPermission: this.permissionsController.hasPermission.bind(
+        this.permissionsController,
+      ),
+      requestPermissions: this.permissionsController.requestPermissions.bind(
         this.permissionsController,
       ),
       removeAllPermissionsFor: this.permissionsController.removeAllPermissionsFor.bind(
@@ -485,6 +488,9 @@ export default class MetamaskController extends EventEmitter {
 
     // TODO:LegacyProvider: Delete
     this.publicConfigStore = this.createPublicConfigStore();
+
+    // Run existing plugins
+    this.pluginController.runExistingPlugins();
   }
 
   /**
@@ -970,6 +976,7 @@ export default class MetamaskController extends EventEmitter {
       removeInlinePlugin: nodeify(
         pluginController.removeInlinePlugin.bind(pluginController),
       ),
+      clearPlugins: nodeify(pluginController.clearState.bind(pluginController)),
     };
   }
 
@@ -1534,13 +1541,16 @@ export default class MetamaskController extends EventEmitter {
     return promise;
   }
 
+  /**
+   * TODO:snaps verify safety of using keyringController.getAccounts
+   */
   async getAppKeyForDomain(domain, requestedAccount) {
     let account;
 
     if (requestedAccount) {
       account = requestedAccount;
     } else {
-      account = (await this.permissionsController.getAccounts(domain))[0];
+      account = (await this.keyringController.getAccounts())[0];
     }
 
     return this.keyringController.exportAppKeyForAddress(account, domain);
@@ -2008,6 +2018,7 @@ export default class MetamaskController extends EventEmitter {
     this.setupProviderConnection(
       mux.createStream('metamask-provider'),
       sender,
+      false,
       isPlugin,
     );
 
@@ -2090,10 +2101,23 @@ export default class MetamaskController extends EventEmitter {
    * @param {MessageSender} sender - The sender of the messages on this stream
    * @param {boolean} isInternal - True if this is a connection with an internal process
    */
-  setupProviderConnection(outStream, sender, isInternal, isPlugin) {
-    const origin = isInternal ? 'metamask' : new URL(sender.url).origin;
+  setupProviderConnection(
+    outStream,
+    sender,
+    isInternal = false,
+    isPlugin = false,
+  ) {
+    let origin;
+    if (isInternal) {
+      origin = 'metamask';
+    } else if (isPlugin) {
+      origin = new URL(sender.url).toString();
+    } else {
+      origin = new URL(sender.url).origin;
+    }
+
     let extensionId;
-    if (sender.id !== this.extension.runtime.id) {
+    if (!isPlugin && sender.id !== this.extension.runtime.id) {
       extensionId = sender.id;
     }
     let tabId;
@@ -2133,7 +2157,11 @@ export default class MetamaskController extends EventEmitter {
    * For plugins running in workers.
    */
   setupWorkerPluginProvider(senderUrl, connectionStream, _workerId) {
-    this.setupUntrustedCommunication(connectionStream, senderUrl, true);
+    const sender = {
+      hostname: senderUrl.hostname,
+      url: senderUrl.url || senderUrl.hostname,
+    };
+    this.setupUntrustedCommunication(connectionStream, sender, true);
   }
 
   /**
@@ -2245,39 +2273,40 @@ export default class MetamaskController extends EventEmitter {
       }),
     );
 
-    if (isPlugin) {
-      engine.push(
-        createPluginMethodMiddleware({
+    engine.push(
+      createPluginMethodMiddleware(isPlugin, {
+        getAppKey: this.getAppKeyForDomain.bind(this, origin),
+        getPlugins: pluginController.getPermittedPlugins.bind(
+          pluginController,
           origin,
-          getAppKey: this.getAppKeyForDomain.bind(this, origin),
-          getSnapState: pluginController.getPluginState.bind(
-            pluginController,
-            origin,
-          ),
-          updateSnapState: pluginController.updateSnapState.bind(
-            pluginController,
-            origin,
-          ),
-          clearSnapState: pluginController.updatePluginState.bind(
-            pluginController,
-            origin,
-            {},
-          ),
-          requestPermissions: permissionsController._requestPermissions.bind(
-            permissionsController,
-            origin,
-          ),
-          getAccounts: permissionsController._getPermittedAccounts.bind(
-            permissionsController,
-            origin,
-          ),
-          installPlugins: pluginController.installPlugins.bind(
-            pluginController,
-            origin,
-          ),
-        }),
-      );
-    }
+        ),
+        getSnapState: pluginController.getPluginState.bind(
+          pluginController,
+          origin,
+        ),
+        updateSnapState: pluginController.updatePluginState.bind(
+          pluginController,
+          origin,
+        ),
+        clearSnapState: pluginController.updatePluginState.bind(
+          pluginController,
+          origin,
+          {},
+        ),
+        requestPermissions: permissionsController.requestPermissions.bind(
+          permissionsController,
+          origin,
+        ),
+        getAccounts: permissionsController._getPermittedAccounts.bind(
+          permissionsController,
+          origin,
+        ),
+        installPlugins: pluginController.installPlugins.bind(
+          pluginController,
+          origin,
+        ),
+      }),
+    );
 
     // filter and subscription polyfills
     engine.push(filterMiddleware);

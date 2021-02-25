@@ -2867,3 +2867,7 @@ export function runInlinePlugin() {
 export function removeInlinePlugin() {
   return promisifiedBackground.removeInlinePlugin();
 }
+
+export function clearPlugins() {
+  return promisifiedBackground.clearPlugins();
+}

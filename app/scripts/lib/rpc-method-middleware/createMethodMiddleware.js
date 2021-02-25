@@ -1,4 +1,5 @@
-import { permitted } from '@mm-snap/rpc-methods';
+import { permittedMethods } from '@mm-snap/rpc-methods';
+import { ethErrors } from 'eth-rpc-errors';
 import handlers from './handlers';
 
 const handlerMap = handlers.reduce((map, handler) => {
@@ -8,7 +9,7 @@ const handlerMap = handlers.reduce((map, handler) => {
   return map;
 }, new Map());
 
-const pluginHandlerMap = permitted.reduce((map, handler) => {
+const pluginHandlerMap = permittedMethods.reduce((map, handler) => {
   for (const methodName of handler.methodNames) {
     map.set(methodName, handler.implementation);
   }
@@ -41,9 +42,12 @@ export function createMethodMiddleware(hooks) {
   };
 }
 
-export function createPluginMethodMiddleware(hooks) {
+export function createPluginMethodMiddleware(isPlugin, hooks) {
   return function methodMiddleware(req, res, next, end) {
     if (pluginHandlerMap.has(req.method)) {
+      if (/^snap_/iu.test(req.method) && !isPlugin) {
+        return end(ethErrors.rpc.methodNotFound());
+      }
       return pluginHandlerMap.get(req.method)(req, res, next, end, hooks);
     }
     return next();

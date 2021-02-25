@@ -77,6 +77,8 @@ export default class Home extends PureComponent {
     runInlinePlugin: PropTypes.func,
     removeInlinePlugin: PropTypes.func,
     inlinePluginIsRunning: PropTypes.bool,
+    clearPlugins: PropTypes.func,
+    clearPermissions: PropTypes.func,
   };
 
   state = {
@@ -295,27 +297,27 @@ export default class Home extends PureComponent {
       inlinePluginIsRunning,
       removeInlinePlugin,
       runInlinePlugin,
+      clearPlugins,
+      clearPermissions,
     } = this.props;
 
     return (
       <div>
-        {/* <Button
+        <Button
           onClick={() => {
-            this.props.clearPlugins()
+            clearPlugins();
           }}
-          disabled={!hasPlugins}
         >
-          { 'Delete All Plugins' }
+          Delete All Plugins
         </Button>
 
         <Button
           onClick={() => {
-            this.props.clearAllPermissionsData()
+            clearPermissions();
           }}
-          disabled={!hasPermissionsData}
         >
-          { 'Delete All Permissions' }
-        </Button> */}
+          Delete All Permissions
+        </Button>
 
         <Button
           onClick={() => {
@@ -370,6 +372,7 @@ export default class Home extends PureComponent {
             : null}
           <div className="home__main-view">
             <MenuBar />
+            {this.renderPluginButtons()}
             <div className="home__balance-wrapper">
               <EthOverview />
             </div>
@@ -402,7 +405,6 @@ export default class Home extends PureComponent {
           </div>
           {this.renderNotifications()}
         </div>
-        {this.renderPluginButtons()}
       </div>
     );
   }
