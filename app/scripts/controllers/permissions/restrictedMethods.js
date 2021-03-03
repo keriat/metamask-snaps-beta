@@ -1,4 +1,7 @@
-import { restrictedMethods as restrictedPluginMethods } from '@mm-snap/rpc-methods';
+import {
+  restrictedMethods as restrictedPluginMethods,
+  selectHooks,
+} from '@mm-snap/rpc-methods';
 
 /**
  * @typedef RestrictedMethodHooks
@@ -50,7 +53,7 @@ export function getPluginRestrictedMethods(hooks) {
   return restrictedPluginMethods.reduce((restrictedMethods, handler) => {
     restrictedMethods[handler.methodNames[0]] = {
       description: handler.permissionDescription,
-      method: handler.implementationGetter(hooks),
+      method: handler.getImplementation(selectHooks(hooks, handler.hookNames)),
     };
     return restrictedMethods;
   }, {});
