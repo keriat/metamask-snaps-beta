@@ -28,20 +28,30 @@ import {
  * @param {RestrictedMethodHooks} hooks - Restricted method hooks.
  */
 export default function getRestrictedMethods({
+  addPlugin,
+  clearSnapState,
   getIdentities,
   getKeyringAccounts,
-  addPlugin,
+  getMnemonic,
   getPlugin,
   getPluginRpcHandler,
+  getSnapState,
+  handleAssetRequest,
   showConfirmation,
+  updateSnapState,
 }) {
   return {
     ...getCommonRestrictedMethods({ getIdentities, getKeyringAccounts }),
     ...getPluginRestrictedMethods({
       addPlugin,
+      clearSnapState,
       getPlugin,
       getPluginRpcHandler,
+      getMnemonic,
+      getSnapState,
+      handleAssetRequest,
       showConfirmation,
+      updateSnapState,
     }),
   };
 }
